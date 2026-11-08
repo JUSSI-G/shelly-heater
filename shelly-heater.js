@@ -14,6 +14,7 @@ let REGION = "FI";
 let API = "https://api.spot-hinta.fi/JustNowRanksAndPrice";
 let SAFETY_OFF = CHECK_MINUTES * 3 * 60; // relay turns itself off if the script stops
 let lastState = null;
+let offlineSince = null;    // uptime when the connection dropped
 
 function ranks(n) {
   let list = [];
@@ -26,7 +27,7 @@ function buildUrl() {
     ranksAllowed: ranks(CHEAPEST_HOURS),
     priceAlwaysAllowed: ALWAYS_ON_PRICE,
     maxPrice: MAX_PRICE,
-    priceResolution: 60,
+    priceResolution: 60,    // rank whole hours, not 15 min slots
     region: REGION
   };
   let query = [];
@@ -52,6 +53,24 @@ function clockOk() {
   return sys && sys.unixtime;
 }
 
+function uptime() {
+  return Shelly.getComponentStatus("sys").uptime;
+}
+
+// Print once when the connection drops, not every check
+function wentOffline(msg) {
+  if (offlineSince !== null) return;
+  offlineSince = uptime();
+  print("OFFLINE - no internet connection (" + msg + ")");
+}
+
+function cameOnline() {
+  if (offlineSince === null) return;
+  let minutes = Math.round((uptime() - offlineSince) / 60);
+  print("ONLINE - internet is back (was offline about " + minutes + " min)");
+  offlineSince = null;
+}
+
 // No internet: heat only during BACKUP_HOURS
 function backup() {
   if (!clockOk()) return setRelay(false, "no internet, clock not set");
@@ -64,9 +83,10 @@ function backup() {
 // anything else = something's wrong
 function onResponse(res, err, msg) {
   if (err !== 0 || !res) {
-    print("API error: " + msg);
+    wentOffline(msg);
     return backup();
   }
+  cameOnline();
   if (res.code === 200) return setRelay(true, "cheap hour");
   if (res.code === 400) return setRelay(false, "not cheap");
   print("Odd response: " + res.code);
