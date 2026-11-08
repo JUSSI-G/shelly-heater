@@ -4,7 +4,7 @@
 
 Pieni skripti Shelly Prolle, joka lämmittää varaajaa vuorokauden halvimpina tunteina. Hinnat tulevat [spot-hinta.fi](https://spot-hinta.fi):n rajapinnasta.
 
-Halusin jotain yksinkertaisempaa kuin isommat valmiit skriptit, eli helppolukuisen ja helposti muokattavan. Tässä se on.
+Yksinkertainen ja muokattava.
 
 ## Miten se toimii
 
