@@ -4,7 +4,7 @@
 
 A small script for Shelly Pro that heats your water heater during the cheapest hours of the day, using Finnish spot prices from [spot-hinta.fi](https://spot-hinta.fi).
 
-I wanted something simpler than the bigger scripts out there, easy to read and easy to change. This is it.
+A script that is simple and easy to read/change.
 
 ## How it works
 
